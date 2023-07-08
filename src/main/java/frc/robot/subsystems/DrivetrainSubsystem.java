@@ -38,7 +38,8 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.settings.CTREConfigs;
+import frc.robot.settings.Constants;
+import frc.robot.settings.Constants.CTREConfigs;
 import frc.robot.settings.Constants.DriveConstants;
 import frc.robot.settings.Constants.DriveConstants.Offsets;
 import frc.robot.settings.Constants.DriveConstants.Positions;
@@ -146,7 +147,20 @@ public class DrivetrainSubsystem extends SubsystemBase {
     public void resetOdometry() {
         odometer.resetPosition(getGyroscopeRotation(), getModulePositions(), DRIVE_ODOMETRY_ORIGIN);
     }
-
+	/**
+	 *  Sets the modules speed and rotation to zero.
+	 */
+	public void pointWheelsForward() {
+		for (int i = 0; i < 4; i++) {
+			setModule(i, new SwerveModuleState(0, new Rotation2d()));
+		}
+	}
+	public void pointWheelsInward() {
+		setModule(0, new SwerveModuleState(0, Rotation2d.fromDegrees(-135)));
+		setModule(1, new SwerveModuleState(0, Rotation2d.fromDegrees(135)));
+		setModule(2, new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
+		setModule(3, new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
+	}
 	public void drive(ChassisSpeeds chassisSpeeds) {
 		SwerveModuleState[] desiredStates = kinematics.toSwerveModuleStates(chassisSpeeds);
 		double maxSpeed = Collections.max(Arrays.asList(desiredStates)).speedMetersPerSecond;
@@ -176,11 +190,9 @@ public class DrivetrainSubsystem extends SubsystemBase {
 		modules[i].setDesiredState(desiredState);
 		lastAngles[i] = desiredState.angle;
 	}
-
 	public void updateOdometry() {
 		odometer.updateWithTime(Timer.getFPGATimestamp(), getGyroscopeRotation(), getModulePositions());
 	}
-
 	@Override
 	public void periodic() {
 		updateOdometry();
