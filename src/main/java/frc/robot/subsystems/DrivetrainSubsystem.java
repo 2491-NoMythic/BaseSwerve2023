@@ -38,7 +38,9 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.LimelightHelpers;
 import frc.robot.settings.Constants;
+import frc.robot.settings.LimelightValues;
 import frc.robot.settings.Constants.CTREConfigs;
 import frc.robot.settings.Constants.DriveConstants;
 import frc.robot.settings.Constants.DriveConstants.Offsets;
@@ -193,9 +195,21 @@ public class DrivetrainSubsystem extends SubsystemBase {
 	public void updateOdometry() {
 		odometer.updateWithTime(Timer.getFPGATimestamp(), getGyroscopeRotation(), getModulePositions());
 	}
-	@Override
+	public void updateOdometryWithVision(Pose2d estematedPose, double timestampSeconds) {
+		odometer.addVisionMeasurement(estematedPose, timestampSeconds);
+	}
+@Override
 	public void periodic() {
 		updateOdometry();
+		if (SmartDashboard.getBoolean("use limelight", false)) {
+			LimelightValues visionData = new LimelightValues(LimelightHelpers.getLatestResults("").targetingResults, LimelightHelpers.getTV(""));
+			Boolean isVisionValid = visionData.isResultValid;
+			Boolean isVisionTrustworthy = isVisionValid && visionData.isPoseTrustworthy(odometer.getEstimatedPosition());
+			SmartDashboard.putBoolean("visionValid", isVisionTrustworthy);
+			if (isVisionTrustworthy || ((SmartDashboard.getBoolean("trust limelight", false)) && isVisionValid)) {
+				updateOdometryWithVision(visionData.getbotPose(), visionData.gettimestamp());
+			}
+		}
 		m_field.setRobotPose(odometer.getEstimatedPosition());
         SmartDashboard.putNumber("Robot Angle", getGyroscopeRotation().getDegrees());
         SmartDashboard.putString("Robot Location", getPose().getTranslation().toString());

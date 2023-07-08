@@ -80,7 +80,8 @@ public class RobotContainer {
         () -> modifyAxis(-driveController.getRawAxis(X_AXIS), DEADBAND_NORMAL),
         () -> modifyAxis(-driveController.getRawAxis(Z_AXIS), DEADBAND_NORMAL));
     drivetrain.setDefaultCommand(defaultDriveCommand);
-
+    SmartDashboard.putBoolean("use limelight", false);
+    SmartDashboard.putBoolean("trust limelight", false);
     autoInit();
     configureBindings();
   }
