@@ -95,8 +95,9 @@ public final class Constants {
     /**
      * The overall drive reduction of the module. Multiplying motor rotations by
      * this value should result in wheel rotations.
+     * these numbers are just gear ratios that are used. Ask build team about these.
      */
-    public static final double DRIVETRAIN_DRIVE_REDUCTION = (14.0 / 50.0) * (28.0 / 16.0) * (15.0 / 45.0);
+    public static final double DRIVETRAIN_DRIVE_REDUCTION = (15.0 / 50.0) * (28.0 / 16.0) * (15.0 / 45.0);
 
     /**
      * Whether the drive motor should be counterclockwise or clockwise positive. 
